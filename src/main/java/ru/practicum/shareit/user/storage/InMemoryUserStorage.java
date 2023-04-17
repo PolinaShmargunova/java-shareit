@@ -10,7 +10,6 @@ import ru.practicum.shareit.user.model.User;
 import java.util.*;
 
 import static ru.practicum.shareit.user.dto.UserMapper.toUser;
-import static ru.practicum.shareit.user.dto.UserMapper.toUserDto;
 
 @Component
 public class InMemoryUserStorage implements UserStorage {
@@ -37,7 +36,7 @@ public class InMemoryUserStorage implements UserStorage {
     public User get(long id) throws NotFoundException {
         if (userMap.containsKey(id)) {
             return userMap.get(id);
-        } else throw new NotFoundException();
+        } else throw new NotFoundException("Данный пользователь не найден");
     }
 
     @Override
@@ -76,5 +75,4 @@ public class InMemoryUserStorage implements UserStorage {
         }
         return true;
     }
-
 }

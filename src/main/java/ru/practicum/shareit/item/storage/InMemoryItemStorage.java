@@ -31,7 +31,7 @@ public class InMemoryItemStorage implements ItemStorage {
     @Override
     public ItemDto patchItem(ItemDto dto, User owner, long itemId) throws NotFoundException {
         if (getItemOwnerId(itemId) != owner.getId()) {
-            throw new NotFoundException();
+            throw new NotFoundException("Эта вещь принадлежит другому пользователю, вы не можете обновить данные");
         }
         Item oldItem = items.get(itemId);
         if (dto.getName() == null) {
@@ -49,7 +49,10 @@ public class InMemoryItemStorage implements ItemStorage {
         return toItemDto(items.get(itemId));
     }
 
-    public long getItemOwnerId(long itemId) {
+    public long getItemOwnerId(long itemId) throws NotFoundException {
+        if (itemId == 0) {
+            throw new NotFoundException("Данная вещь не найдена");
+        }
         return items.get(itemId).getOwner().getId();
     }
 

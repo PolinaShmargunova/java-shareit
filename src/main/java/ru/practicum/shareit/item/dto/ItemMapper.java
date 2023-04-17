@@ -10,7 +10,6 @@ public class ItemMapper {
                 item.getName(),
                 item.getDescription(),
                 item.isAvailable()
-
         );
     }
 
@@ -23,5 +22,4 @@ public class ItemMapper {
                 null
         );
     }
-
 }
