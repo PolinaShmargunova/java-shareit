@@ -4,9 +4,13 @@ import org.springframework.stereotype.Component;
 import ru.practicum.shareit.exception.BadRequestException;
 import ru.practicum.shareit.exception.ConflictException;
 import ru.practicum.shareit.exception.NotFoundException;
+import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
 
 import java.util.*;
+
+import static ru.practicum.shareit.user.dto.UserMapper.toUser;
+import static ru.practicum.shareit.user.dto.UserMapper.toUserDto;
 
 @Component
 public class InMemoryUserStorage implements UserStorage {
@@ -15,18 +19,18 @@ public class InMemoryUserStorage implements UserStorage {
     long id = 1;
 
     @Override
-    public User add(User user) throws BadRequestException {
+    public User add(UserDto dto) throws BadRequestException {
 
-        if (user.getEmail() == null) {
+        if (dto.getEmail() == null) {
             throw new BadRequestException();
         }
-        user.setId(id);
-        if (!isUniqueEmail(user.getEmail(), user.getId())) {
+        dto.setId(id);
+        if (!isUniqueEmail(dto.getEmail(), dto.getId())) {
             throw new ConflictException();
         }
-        userMap.put(user.getId(), user);
+        userMap.put(dto.getId(), toUser(dto));
         id++;
-        return userMap.get(user.getId());
+        return userMap.get(dto.getId());
     }
 
     @Override

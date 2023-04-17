@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.exception.BadRequestException;
 import ru.practicum.shareit.exception.NotFoundException;
+import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
 
 import javax.validation.Valid;
@@ -22,9 +23,9 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping
-    public User add(@Valid @RequestBody User user) throws BadRequestException {
+    public User add(@Valid @RequestBody UserDto dto) throws BadRequestException {
         log.info("Получен запрос POST /users");
-        return userService.add(user);
+        return userService.add(dto);
     }
 
     @GetMapping(value = "/{id}")

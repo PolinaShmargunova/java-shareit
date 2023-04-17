@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.BadRequestException;
 import ru.practicum.shareit.exception.NotFoundException;
+import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.storage.UserStorage;
 
@@ -18,9 +19,9 @@ public class UserService {
 
     private final UserStorage userStorage;
 
-    public User add(User user) throws BadRequestException {
+    public User add(UserDto dto) throws BadRequestException {
         log.info("Добавлен новый пользователь");
-        return userStorage.add(user);
+        return userStorage.add(dto);
     }
 
     public User getUserById(long id) throws NotFoundException {
