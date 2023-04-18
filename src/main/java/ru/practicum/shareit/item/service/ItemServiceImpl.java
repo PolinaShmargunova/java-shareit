@@ -33,18 +33,18 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ItemDto getItem(long itemId, long ownerId) {
+    public ItemDto getItem(long itemId, long ownerId) throws NotFoundException {
         log.info("Получен предмет с id " + itemId);
         return itemStorage.getItem(itemId,ownerId);
     }
 
     @Override
-    public List<ItemDto> getAllItemsByOwner(long ownerId) {
+    public List<ItemDto> getAllItemsByOwner(long ownerId) throws NotFoundException {
         return itemStorage.getAllItemsByOwner(ownerId);
     }
 
     @Override
-    public List<ItemDto> searchItem(String text, long ownerId) {
+    public List<ItemDto> searchItem(String text, long ownerId) throws NotFoundException {
         return itemStorage.searchItem(text,ownerId);
     }
 }

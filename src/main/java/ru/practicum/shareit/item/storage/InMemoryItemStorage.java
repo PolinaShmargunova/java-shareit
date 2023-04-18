@@ -21,7 +21,7 @@ public class InMemoryItemStorage implements ItemStorage {
     long id = 1;
 
     @Override
-    public ItemDto addItem(ItemDto dto, User owner) {
+    public ItemDto addItem(ItemDto dto, User owner) throws NotFoundException {
         dto.setId(id++);
         items.put(dto.getId(), toItem(dto,owner));
 
@@ -57,12 +57,12 @@ public class InMemoryItemStorage implements ItemStorage {
     }
 
     @Override
-    public ItemDto getItem(long itemId, long ownerId) {
+    public ItemDto getItem(long itemId, long ownerId) throws NotFoundException {
         return toItemDto(items.get(itemId));
     }
 
     @Override
-    public List<ItemDto> getAllItemsByOwner(long ownerId) {
+    public List<ItemDto> getAllItemsByOwner(long ownerId) throws NotFoundException {
         List<ItemDto> allItems = new ArrayList<>();
         for (Item item : items.values()) {
             if (item.getOwner().getId() == ownerId) {
@@ -73,7 +73,7 @@ public class InMemoryItemStorage implements ItemStorage {
     }
 
     @Override
-    public List<ItemDto> searchItem(String text, long ownerId) {
+    public List<ItemDto> searchItem(String text, long ownerId) throws NotFoundException {
         List<ItemDto> foundItems = new ArrayList<>();
         for (Item item : items.values()) {
             if (item.isAvailable() && !text.equals("")) {

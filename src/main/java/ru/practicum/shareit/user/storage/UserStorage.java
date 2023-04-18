@@ -14,7 +14,7 @@ public interface UserStorage {
 
     Collection<User> getAll();
 
-    User update(User user, long id);
+    User update(UserDto dto, long id);
 
     void delete(long id);
 }

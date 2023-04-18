@@ -41,9 +41,9 @@ public class UserController {
     }
 
     @PatchMapping(value = "/{id}")
-    public User update(@RequestBody User user, @PathVariable long id) {
+    public User update(@RequestBody UserDto dto, @PathVariable long id) {
         log.info("Получен запрос PATCH /users/" + id);
-        return userService.update(user, id);
+        return userService.update(dto, id);
     }
 
     @DeleteMapping(value = "/{id}")

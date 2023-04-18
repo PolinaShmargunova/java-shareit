@@ -11,9 +11,9 @@ public interface ItemService {
 
     ItemDto patchItem(ItemDto dto,long ownerId, long itemId) throws NotFoundException;
 
-    ItemDto getItem(long itemId, long ownerId);
+    ItemDto getItem(long itemId, long ownerId) throws NotFoundException;
 
-    List<ItemDto> getAllItemsByOwner(long ownerId);
+    List<ItemDto> getAllItemsByOwner(long ownerId) throws NotFoundException;
 
-    List<ItemDto> searchItem(String text, long ownerId);
+    List<ItemDto> searchItem(String text, long ownerId) throws NotFoundException;
 }

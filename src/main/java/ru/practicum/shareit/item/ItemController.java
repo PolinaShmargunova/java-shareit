@@ -43,19 +43,19 @@ public class ItemController {
     }
 
     @GetMapping(value = "/{itemId}")
-    public ItemDto getItem(@PathVariable long itemId, @RequestHeader("X-Sharer-User-Id") long ownerId) {
+    public ItemDto getItem(@PathVariable long itemId, @RequestHeader("X-Sharer-User-Id") long ownerId) throws NotFoundException {
         log.info("Получен запрос GET /items/" + itemId);
         return itemService.getItem(itemId,ownerId);
     }
 
     @GetMapping
-    public List<ItemDto> getAllItemsByOwner(@RequestHeader("X-Sharer-User-Id") long ownerId) {
+    public List<ItemDto> getAllItemsByOwner(@RequestHeader("X-Sharer-User-Id") long ownerId) throws NotFoundException {
         log.info("Получен запрос GET /items");
         return itemService.getAllItemsByOwner(ownerId);
     }
 
     @GetMapping("/search")
-    public List<ItemDto> searchItem(@RequestParam String text, @RequestHeader("X-Sharer-User-Id") long ownerId) {
+    public List<ItemDto> searchItem(@RequestParam String text, @RequestHeader("X-Sharer-User-Id") long ownerId) throws NotFoundException {
         log.info("Получен запрос GET /items/search?text=" + text);
         return itemService.searchItem(text.toLowerCase(),ownerId);
     }

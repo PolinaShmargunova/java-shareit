@@ -33,9 +33,9 @@ public class UserService {
         return new ArrayList<>(userStorage.getAll());
     }
 
-    public User update(User user, long id) {
+    public User update(UserDto dto, long id) {
         log.info("Обновлен пользователь с id " + id);
-        return userStorage.update(user,id);
+        return userStorage.update(dto,id);
     }
 
     public void delete(long id) {

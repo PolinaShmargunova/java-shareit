@@ -45,18 +45,18 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public User update(User user, long id) {
-        user.setId(id);
-        if (user.getName() == null) {
-            user.setName(userMap.get(id).getName());
+    public User update(UserDto dto, long id) {
+        dto.setId(id);
+        if (dto.getName() == null) {
+            dto.setName(userMap.get(id).getName());
         }
-        if (user.getEmail() == null) {
-            user.setEmail(userMap.get(id).getEmail());
+        if (dto.getEmail() == null) {
+            dto.setEmail(userMap.get(id).getEmail());
         }
-        if (!isUniqueEmail(user.getEmail(), user.getId())) {
+        if (!isUniqueEmail(dto.getEmail(), dto.getId())) {
             throw new ConflictException();
         }
-        userMap.put(id, user);
+        userMap.put(id, toUser(dto));
         return userMap.get(id);
     }
 
