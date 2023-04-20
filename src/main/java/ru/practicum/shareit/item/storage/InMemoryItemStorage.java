@@ -53,6 +53,9 @@ public class InMemoryItemStorage implements ItemStorage {
         if (itemId == 0) {
             throw new NotFoundException("Данная вещь не найдена");
         }
+        if (items.size() == 0) {
+            throw new NotFoundException("Информация о владельце не найдена");
+        }
         return items.get(itemId).getOwner().getId();
     }
 
