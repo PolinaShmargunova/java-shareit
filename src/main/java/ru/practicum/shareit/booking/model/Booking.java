@@ -1,41 +1,44 @@
-package ru.practicum.shareit.user.model;
+package ru.practicum.shareit.booking.model;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 import lombok.experimental.FieldDefaults;
+import ru.practicum.shareit.booking.model.enums.Status;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotNull;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
-@ToString
+@Builder
 @Entity
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@Table(name = "Bookings")
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "users")
-public class User {
-
+public class Booking {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     long id;
-
-    @Column(name = "name")
-    String name;
-
-    @Email
-    @NotNull
-    @Column(name = "email", unique = true, nullable = false)
-    String email;
+    @Column(name = "start_date")
+    LocalDateTime start;
+    @Column(name = "end_date")
+    LocalDateTime end;
+    @Column(name = "item_id")
+    long itemId;
+    @Column(name = "booker_id")
+    long bookerId;
+    @Enumerated(EnumType.STRING)
+    Status status;
 }

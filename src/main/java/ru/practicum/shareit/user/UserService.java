@@ -5,11 +5,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.BadRequestException;
 import ru.practicum.shareit.exception.NotFoundException;
-import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.user.storage.UserStorage;
+import ru.practicum.shareit.user.storage.UserRepository;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -17,29 +15,50 @@ import java.util.List;
 @AllArgsConstructor
 public class UserService {
 
-    private final UserStorage userStorage;
+    private final UserRepository userRepository;
 
-    public User add(UserDto dto) throws BadRequestException {
+    public User add(User user) {
         log.info("Добавлен новый пользователь");
-        return userStorage.add(dto);
+
+        return userRepository.save(user);
     }
 
     public User getUserById(long id) throws NotFoundException {
-        log.info("Получен пользователь с id " + id);
-        return userStorage.get(id);
+
+        if (userRepository.findById(id).isPresent()) {
+            log.info("Получен пользователь с id " + id);
+            return userRepository.findById(id).get();
+        } else {
+            throw new NotFoundException();
+        }
     }
 
     public List<User> getAllUsers() {
-        return new ArrayList<>(userStorage.getAll());
+        return userRepository.findAll();
     }
 
-    public User update(UserDto dto, long id) {
+    public User update(User user, long id) throws NotFoundException {
+        user.setId(id);
+        if (user.getName() == null) {
+            if (userRepository.findById(id).isPresent()) {
+                user.setName(userRepository.findById(id).get().getName());
+            } else {
+                throw new NotFoundException();
+            }
+        }
+        if (user.getEmail() == null) {
+            if (userRepository.findById(id).isPresent()) {
+                user.setEmail(userRepository.findById(id).get().getEmail());
+            } else {
+                throw new NotFoundException();
+            }
+        }
         log.info("Обновлен пользователь с id " + id);
-        return userStorage.update(dto,id);
+        return userRepository.save(user);
     }
 
     public void delete(long id) {
         log.info("Удалён пользователь с id " + id);
-        userStorage.delete(id);
+        userRepository.deleteById(id);
     }
 }

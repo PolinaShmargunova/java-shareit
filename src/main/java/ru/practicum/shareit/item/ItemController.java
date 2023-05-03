@@ -11,16 +11,16 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import ru.practicum.shareit.exception.BadRequestException;
 import ru.practicum.shareit.exception.NotFoundException;
+import ru.practicum.shareit.item.dto.GetItemDto;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.service.ItemService;
 
 import javax.validation.Valid;
 import java.util.List;
 
-/**
- * TODO Sprint add-controllers.
- */
 @Slf4j
 @RestController
 @AllArgsConstructor
@@ -28,35 +28,45 @@ import java.util.List;
 public class ItemController {
     private final ItemService itemService;
 
+    private final String header = "X-Sharer-User-Id";
+
     @PostMapping
-    public ItemDto addItem(@RequestBody @Valid ItemDto dto,
-                           @RequestHeader("X-Sharer-User-Id") long ownerId) throws NotFoundException {
+    public ItemDto addItem(@RequestBody @Valid ItemDto dto, @RequestHeader(header) long ownerId)
+            throws NotFoundException {
         log.info("Получен запрос POST /items");
         return itemService.addItem(dto,ownerId);
     }
 
     @PatchMapping(value = "/{itemId}")
     public ItemDto patchItem(@RequestBody ItemDto dto, @PathVariable long itemId,
-                             @RequestHeader("X-Sharer-User-Id") long ownerId) throws NotFoundException {
-        log.info("Получен запрос PATCH /items/" + itemId);
+                             @RequestHeader(header) long ownerId) throws NotFoundException {
+        log.info(String.format("Получен запрос PATCH /items/%s", itemId));
         return itemService.patchItem(dto,ownerId,itemId);
     }
 
     @GetMapping(value = "/{itemId}")
-    public ItemDto getItem(@PathVariable long itemId, @RequestHeader("X-Sharer-User-Id") long ownerId) throws NotFoundException {
-        log.info("Получен запрос GET /items/" + itemId);
+    public GetItemDto getItem(@PathVariable long itemId, @RequestHeader(header) long ownerId) throws NotFoundException {
+        log.info(String.format("Получен запрос GET /items/%s", itemId));
         return itemService.getItem(itemId,ownerId);
     }
 
     @GetMapping
-    public List<ItemDto> getAllItemsByOwner(@RequestHeader("X-Sharer-User-Id") long ownerId) throws NotFoundException {
+    public List<GetItemDto> getAllItemsByOwner(@RequestHeader(header) long ownerId) {
         log.info("Получен запрос GET /items");
         return itemService.getAllItemsByOwner(ownerId);
     }
 
     @GetMapping("/search")
-    public List<ItemDto> searchItem(@RequestParam String text, @RequestHeader("X-Sharer-User-Id") long ownerId) throws NotFoundException {
-        log.info("Получен запрос GET /items/search?text=" + text);
+    public List<ItemDto> searchItem(@RequestParam String text, @RequestHeader(header) long ownerId) {
+        log.info(String.format("Получен запрос GET /items/search?text=%s", text));
         return itemService.searchItem(text.toLowerCase(),ownerId);
+    }
+
+    @PostMapping("{itemId}/comment")
+    public Comment addComment(@RequestBody @Valid Comment dto, @PathVariable long itemId,
+                              @RequestHeader(header) long authorId)
+            throws NotFoundException, BadRequestException {
+        log.info("Получен запрос POST /items/" + itemId + "/comment");
+        return itemService.addComment(dto, itemId, authorId);
     }
 }

@@ -1,9 +1,8 @@
 package ru.practicum.shareit.item.model;
 
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 
 import javax.persistence.Column;
@@ -11,29 +10,30 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import java.time.LocalDateTime;
 
-@Data
+@Getter
+@Setter
 @Entity
-@AllArgsConstructor
-@NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@Table(name = "items")
-public class Item {
+public class Comment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     long id;
 
-    String name;
+    @NotBlank
+    @NotNull
+    String text;
 
-    String description;
+    LocalDateTime created;
 
-    boolean available;
+    @Column(name = "item_id")
+    long itemId;
 
-    @Column(name = "owner_id")
-    long ownerId;
-
-    @Column(name = "request_id")
-    long requestId;
+    @Column(name = "author_id")
+    long authorId;
+    String authorName;
 }
