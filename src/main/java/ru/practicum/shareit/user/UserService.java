@@ -25,6 +25,7 @@ public class UserService {
             throw new ConflictException("Такой пользователь уже существует");
         }
     }
+
     public User getUserById(long id) throws NotFoundException {
         if (userRepository.findById(id).isPresent()) {
             log.info("Получен пользователь с id " + id);
