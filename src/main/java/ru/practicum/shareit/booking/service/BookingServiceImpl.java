@@ -33,13 +33,13 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public FullBookingDto addBooking(BookingDto dto, long bookerId) throws BadRequestException, NotFoundException {
-        Optional<Item> itemId = itemRepository.findById(dto.getItemId());
+        Optional<Item> itemIdDatabase = itemRepository.findById(dto.getItemId());
 
-        if ((itemId.isEmpty() || userRepository.findById(bookerId).isEmpty())
-                || itemId.get().getOwnerId() == bookerId) {
+        if ((itemIdDatabase.isEmpty() || userRepository.findById(bookerId).isEmpty())
+                || itemIdDatabase.get().getOwnerId() == bookerId) {
             throw new NotFoundException("Не найдены параметра для создания бронирования");
         }
-        if (itemId.get().isAvailable() && dto.getEnd().isAfter(dto.getStart())) {
+        if (itemIdDatabase.get().isAvailable() && dto.getEnd().isAfter(dto.getStart())) {
             return BookingMapper.toFullBookingFromBooking(
                     bookingRepository.save(BookingMapper.toBooking(dto, bookerId, Status.WAITING)),
                     Status.WAITING, itemRepository, userRepository);
@@ -51,21 +51,22 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public FullBookingDto approveBooking(long bookingId, boolean approved, long itemOwnerId)
             throws BadRequestException, NotFoundException {
+        Optional<Booking> bookingIdDatabase = bookingRepository.findById(bookingId);
         try {
-            if (itemRepository.findById(bookingRepository.findById(bookingId).get()
+            if (itemRepository.findById(bookingIdDatabase.get()
                 .getItemId()).get().getOwnerId() != itemOwnerId) {
                 throw new NotFoundException("Не найден владелец вещи");
             }
         } catch (Exception e) {
             throw new NotFoundException("Не найден владелец вещи");
         }
-        if (bookingRepository.findById(bookingId).isPresent()) {
-            long bookerId = bookingRepository.findById(bookingId).get().getBookerId();
-            BookingDto dto = BookingMapper.toBookingDto(bookingRepository.findById(bookingId).get());
+        if (bookingIdDatabase.isPresent()) {
+            long bookerId = bookingIdDatabase.get().getBookerId();
+            BookingDto dto = BookingMapper.toBookingDto(bookingIdDatabase.get());
             dto.setId(bookingId);
             Booking booking;
             Status status;
-            if (bookingRepository.findById(bookingId).get().getStatus() == Status.APPROVED && approved) {
+            if (bookingIdDatabase.get().getStatus() == Status.APPROVED && approved) {
                 throw new BadRequestException();
             }
             if (approved) {
@@ -85,8 +86,9 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public FullBookingDto getBooking(long bookingId, long bookerId) throws NotFoundException {
         Booking booking;
-        if (bookingRepository.findById(bookingId).isPresent()) {
-            booking = bookingRepository.findById(bookingId).get();
+        Optional<Booking> bookingIdDatabase = bookingRepository.findById(bookingId);
+        if (bookingIdDatabase.isPresent()) {
+            booking = bookingIdDatabase.get();
         } else {
             throw new NotFoundException("Несуществующее бронирование");
         }

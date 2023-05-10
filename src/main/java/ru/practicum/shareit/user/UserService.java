@@ -9,6 +9,7 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.storage.UserRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -27,9 +28,10 @@ public class UserService {
     }
 
     public User getUserById(long id) throws NotFoundException {
-        if (userRepository.findById(id).isPresent()) {
+        Optional<User> userIdDatabase = userRepository.findById(id);
+        if (userIdDatabase.isPresent()) {
             log.info("Получен пользователь с id " + id);
-            return userRepository.findById(id).get();
+            return userIdDatabase.get();
         } else {
             throw new NotFoundException("Пользователь не найден");
         }
@@ -41,16 +43,17 @@ public class UserService {
 
     public User update(User user, long id) throws NotFoundException {
         user.setId(id);
+        Optional<User> userIdDatabase = userRepository.findById(id);
         if (user.getName() == null) {
-            if (userRepository.findById(id).isPresent()) {
-                user.setName(userRepository.findById(id).get().getName());
+            if (userIdDatabase.isPresent()) {
+                user.setName(userIdDatabase.get().getName());
             } else {
                 throw new NotFoundException("Обновление невозможно - выбранный пользователь не существует");
             }
         }
         if (user.getEmail() == null) {
-            if (userRepository.findById(id).isPresent()) {
-                user.setEmail(userRepository.findById(id).get().getEmail());
+            if (userIdDatabase.isPresent()) {
+                user.setEmail(userIdDatabase.get().getEmail());
             } else {
                 throw new NotFoundException("Обновление невозможно - выбранный пользователь не существует");
             }

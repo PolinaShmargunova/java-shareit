@@ -18,10 +18,7 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.storage.UserRepository;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static ru.practicum.shareit.item.dto.ItemMapper.toGetItemDto;
@@ -44,18 +41,19 @@ public class ItemServiceImpl implements ItemService {
         if (userRepository.existsById(ownerId)) {
             return toItemDto(itemRepository.save(toItem(dto, ownerId)));
         } else {
-            throw new NotFoundException("Не удалось добавить предмет");
+            throw new NotFoundException("Не найден пользователь с id " + ownerId);
         }
     }
 
     @Override
     public ItemDto patchItem(ItemDto dto, long ownerId, long itemId) throws NotFoundException {
+        Optional<Item> idItemDatabase = itemRepository.findById(itemId);
         dto.setId(itemId);
         if (getItemOwnerId(itemId) != ownerId) {
             throw new NotFoundException("Обновление невозможно");
         }
-        if (itemRepository.findById(itemId).isPresent()) {
-            Item oldItem = itemRepository.findById(itemId).get();
+        if (idItemDatabase.isPresent()) {
+            Item oldItem = idItemDatabase.get();
 
             if (dto.getName() == null) {
                 dto.setName(oldItem.getName());
