@@ -3,6 +3,7 @@ package ru.practicum.shareit.user;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.exception.ConflictException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.storage.UserRepository;
@@ -16,19 +17,22 @@ public class UserService {
 
     private final UserRepository userRepository;
 
-    public User add(User user) {
-        log.info("Добавлен новый пользователь");
+    public User add(User user) throws ConflictException {
+        try {
+            log.info("Добавлен новый пользователь");
+            return userRepository.save(user);
+        } catch (Exception e) {
+            throw new ConflictException("Такой пользователь уже существует");
+        }
 
-        return userRepository.save(user);
     }
-
     public User getUserById(long id) throws NotFoundException {
 
         if (userRepository.findById(id).isPresent()) {
             log.info("Получен пользователь с id " + id);
             return userRepository.findById(id).get();
         } else {
-            throw new NotFoundException();
+            throw new NotFoundException("Пользователь не найден");
         }
     }
 
@@ -42,14 +46,14 @@ public class UserService {
             if (userRepository.findById(id).isPresent()) {
                 user.setName(userRepository.findById(id).get().getName());
             } else {
-                throw new NotFoundException();
+                throw new NotFoundException("Обновление невозможно - выбранный пользователь не существует");
             }
         }
         if (user.getEmail() == null) {
             if (userRepository.findById(id).isPresent()) {
                 user.setEmail(userRepository.findById(id).get().getEmail());
             } else {
-                throw new NotFoundException();
+                throw new NotFoundException("Обновление невозможно - выбранный пользователь не существует");
             }
         }
         log.info("Обновлен пользователь с id " + id);

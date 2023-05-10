@@ -11,7 +11,8 @@ import java.util.List;
 public interface BookingService {
     FullBookingDto addBooking(BookingDto dto, long bookerId) throws BadRequestException, NotFoundException;
 
-    FullBookingDto approveBooking(long bookingId, boolean approved, long bookerId) throws BadRequestException, NotFoundException;
+    FullBookingDto approveBooking(long bookingId, boolean approved, long bookerId)
+            throws BadRequestException, NotFoundException;
 
     FullBookingDto getBooking(long bookingId, long bookerId) throws NotFoundException;
 

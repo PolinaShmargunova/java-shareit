@@ -44,7 +44,7 @@ public class ItemServiceImpl implements ItemService {
         if (userRepository.existsById(ownerId)) {
             return toItemDto(itemRepository.save(toItem(dto, ownerId)));
         } else {
-            throw new NotFoundException();
+            throw new NotFoundException("Не удалось добавить предмет");
         }
     }
 
@@ -52,7 +52,7 @@ public class ItemServiceImpl implements ItemService {
     public ItemDto patchItem(ItemDto dto, long ownerId, long itemId) throws NotFoundException {
         dto.setId(itemId);
         if (getItemOwnerId(itemId) != ownerId) {
-            throw new NotFoundException();
+            throw new NotFoundException("Обновление невозможно");
         }
         if (itemRepository.findById(itemId).isPresent()) {
             Item oldItem = itemRepository.findById(itemId).get();
@@ -67,7 +67,7 @@ public class ItemServiceImpl implements ItemService {
                 dto.setAvailable(oldItem.isAvailable());
             }
         } else {
-            throw new NotFoundException();
+            throw new NotFoundException("Обновление невозможно");
         }
         log.info("Обновлен предмет с id " + itemId);
         return toItemDto(itemRepository.save(toItem(dto, ownerId)));
@@ -101,7 +101,7 @@ public class ItemServiceImpl implements ItemService {
                 return toGetItemDto(item, null, comments);
             }
         } else {
-            throw new NotFoundException();
+            throw new NotFoundException("Данный предмет не существует");
         }
     }
 

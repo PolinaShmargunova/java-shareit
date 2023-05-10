@@ -26,7 +26,7 @@ public class InMemoryUserStorage implements UserStorage {
         }
         user.setId(id);
         if (!isUniqueEmail(user.getEmail(), user.getId())) {
-            throw new ConflictException();
+            throw new ConflictException("Такой пользователь уже существует");
         }
         userMap.put(user.getId(), user);
         id++;
@@ -37,7 +37,7 @@ public class InMemoryUserStorage implements UserStorage {
     public User get(long id) throws NotFoundException {
         if (userMap.containsKey(id)) {
             return userMap.get(id);
-        } else throw new NotFoundException();
+        } else throw new NotFoundException("Не удалось получить пользователя");
     }
 
     @Override
@@ -55,7 +55,7 @@ public class InMemoryUserStorage implements UserStorage {
             user.setEmail(userMap.get(id).getEmail());
         }
         if (!isUniqueEmail(user.getEmail(), user.getId())) {
-            throw new ConflictException();
+            throw new ConflictException("Пользователь с таким email уже существует");
         }
         userMap.put(id, user);
         return userMap.get(id);

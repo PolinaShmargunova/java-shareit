@@ -13,11 +13,13 @@ import ru.practicum.shareit.booking.model.enums.Status;
 import ru.practicum.shareit.booking.storage.BookingRepository;
 import ru.practicum.shareit.exception.BadRequestException;
 import ru.practicum.shareit.exception.NotFoundException;
+import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.storage.ItemRepository;
 import ru.practicum.shareit.user.storage.UserRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -31,12 +33,13 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public FullBookingDto addBooking(BookingDto dto, long bookerId) throws BadRequestException, NotFoundException {
-        if ((itemRepository.findById(dto.getItemId()).isEmpty() || userRepository.findById(bookerId).isEmpty())
-                || itemRepository.findById(dto.getItemId()).get().getOwnerId() == bookerId) {
-            throw new NotFoundException();
+        Optional<Item> itemId = itemRepository.findById(dto.getItemId());
+
+        if ((itemId.isEmpty() || userRepository.findById(bookerId).isEmpty())
+                || itemId.get().getOwnerId() == bookerId) {
+            throw new NotFoundException("Не найдены параметра для создания бронирования");
         }
-        if (itemRepository.findById(dto.getItemId()).get().isAvailable()
-                && dto.getEnd().isAfter(dto.getStart())) {
+        if (itemId.get().isAvailable() && dto.getEnd().isAfter(dto.getStart())) {
             return BookingMapper.toFullBookingFromBooking(
                     bookingRepository.save(BookingMapper.toBooking(dto, bookerId, Status.WAITING)),
                     Status.WAITING, itemRepository, userRepository);
@@ -48,9 +51,13 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public FullBookingDto approveBooking(long bookingId, boolean approved, long itemOwnerId)
             throws BadRequestException, NotFoundException {
-        if (itemRepository.findById(bookingRepository.findById(bookingId).get()
+        try {
+            if (itemRepository.findById(bookingRepository.findById(bookingId).get()
                 .getItemId()).get().getOwnerId() != itemOwnerId) {
-            throw new NotFoundException();
+                throw new NotFoundException("Не найден владелец вещи");
+            }
+        } catch (Exception e) {
+            throw new NotFoundException("Не найден владелец вещи");
         }
         if (bookingRepository.findById(bookingId).isPresent()) {
             long bookerId = bookingRepository.findById(bookingId).get().getBookerId();
@@ -71,7 +78,7 @@ public class BookingServiceImpl implements BookingService {
             return BookingMapper.toFullBookingFromBooking(bookingRepository.save(booking), status,
                     itemRepository, userRepository);
         } else {
-            throw new NotFoundException();
+            throw new NotFoundException("Несуществующее бронирование");
         }
     }
 
@@ -81,11 +88,11 @@ public class BookingServiceImpl implements BookingService {
         if (bookingRepository.findById(bookingId).isPresent()) {
             booking = bookingRepository.findById(bookingId).get();
         } else {
-            throw new NotFoundException();
+            throw new NotFoundException("Несуществующее бронирование");
         }
         if (booking.getBookerId() != bookerId &&
                 itemRepository.findById(booking.getItemId()).get().getOwnerId() != bookerId) {
-            throw new NotFoundException();
+            throw new NotFoundException("Бронирование своей вещи невозможно");
         }
         Status status = booking.getStatus();
         return BookingMapper.toFullBookingFromBooking(booking, status, itemRepository, userRepository);
@@ -94,7 +101,7 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public List<FullBookingDto> getAllBookingsByBookerId(long bookerId, BookingState state) throws NotFoundException {
         if (userRepository.findById(bookerId).isEmpty()) {
-            throw new NotFoundException();
+            throw new NotFoundException("Не найден хозяин бронирования");
         }
         switch (state) {
             case ALL:
@@ -147,7 +154,7 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public List<FullBookingDto> getAllBookingByItemsByOwnerId(long ownerId, BookingState state) throws NotFoundException {
         if (userRepository.findById(ownerId).isEmpty()) {
-            throw new NotFoundException();
+            throw new NotFoundException("Не найден владелец вещи");
         }
 
         switch (state) {
