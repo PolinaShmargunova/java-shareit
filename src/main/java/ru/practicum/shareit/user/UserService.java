@@ -26,7 +26,6 @@ public class UserService {
         }
     }
     public User getUserById(long id) throws NotFoundException {
-
         if (userRepository.findById(id).isPresent()) {
             log.info("Получен пользователь с id " + id);
             return userRepository.findById(id).get();
