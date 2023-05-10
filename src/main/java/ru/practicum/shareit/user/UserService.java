@@ -24,7 +24,6 @@ public class UserService {
         } catch (Exception e) {
             throw new ConflictException("Такой пользователь уже существует");
         }
-
     }
     public User getUserById(long id) throws NotFoundException {
 
