@@ -4,12 +4,13 @@ import org.springframework.stereotype.Component;
 import ru.practicum.shareit.exception.BadRequestException;
 import ru.practicum.shareit.exception.ConflictException;
 import ru.practicum.shareit.exception.NotFoundException;
-import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
 
-import java.util.*;
-
-import static ru.practicum.shareit.user.dto.UserMapper.toUser;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Component
 public class InMemoryUserStorage implements UserStorage {
@@ -18,25 +19,25 @@ public class InMemoryUserStorage implements UserStorage {
     long id = 1;
 
     @Override
-    public User add(UserDto dto) throws BadRequestException {
+    public User add(User user) throws BadRequestException {
 
-        if (dto.getEmail() == null) {
+        if (user.getEmail() == null) {
             throw new BadRequestException();
         }
-        dto.setId(id);
-        if (!isUniqueEmail(dto.getEmail(), dto.getId())) {
-            throw new ConflictException();
+        user.setId(id);
+        if (!isUniqueEmail(user.getEmail(), user.getId())) {
+            throw new ConflictException("Такой пользователь уже существует");
         }
-        userMap.put(dto.getId(), toUser(dto));
+        userMap.put(user.getId(), user);
         id++;
-        return userMap.get(dto.getId());
+        return userMap.get(user.getId());
     }
 
     @Override
     public User get(long id) throws NotFoundException {
         if (userMap.containsKey(id)) {
             return userMap.get(id);
-        } else throw new NotFoundException("Данный пользователь не найден");
+        } else throw new NotFoundException("Не удалось получить пользователя");
     }
 
     @Override
@@ -45,18 +46,18 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public User update(UserDto dto, long id) {
-        dto.setId(id);
-        if (dto.getName() == null) {
-            dto.setName(userMap.get(id).getName());
+    public User update(User user, long id) {
+        user.setId(id);
+        if (user.getName() == null) {
+            user.setName(userMap.get(id).getName());
         }
-        if (dto.getEmail() == null) {
-            dto.setEmail(userMap.get(id).getEmail());
+        if (user.getEmail() == null) {
+            user.setEmail(userMap.get(id).getEmail());
         }
-        if (!isUniqueEmail(dto.getEmail(), dto.getId())) {
-            throw new ConflictException();
+        if (!isUniqueEmail(user.getEmail(), user.getId())) {
+            throw new ConflictException("Пользователь с таким email уже существует");
         }
-        userMap.put(id, toUser(dto));
+        userMap.put(id, user);
         return userMap.get(id);
     }
 

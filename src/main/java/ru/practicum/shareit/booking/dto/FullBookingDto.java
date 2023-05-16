@@ -1,15 +1,16 @@
-package ru.practicum.shareit.booking;
+package ru.practicum.shareit.booking.dto;
 
-import ru.practicum.shareit.booking.model.Status;
+import lombok.Builder;
+import lombok.Data;
+import ru.practicum.shareit.booking.model.enums.Status;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 
 import java.time.LocalDateTime;
 
-/**
- * TODO Sprint add-bookings.
- */
-public class Booking {
+@Builder
+@Data
+public class FullBookingDto {
     private long id;
     private LocalDateTime start;
     private LocalDateTime end;

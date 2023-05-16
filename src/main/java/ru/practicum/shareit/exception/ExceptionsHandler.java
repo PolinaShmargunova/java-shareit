@@ -1,43 +1,46 @@
 package ru.practicum.shareit.exception;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.MethodArgumentNotValidException;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
-import java.util.Map;
-
+@Slf4j
 @RestControllerAdvice
 public class ExceptionsHandler {
 
     @ExceptionHandler
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public Map<String, String> notFound(final NotFoundException e) {
-        return Map.of("", e.getMessage());
+    public ResponseEntity<ErrorResponse> constraintException(final MethodArgumentTypeMismatchException e) {
+        log.error("MethodArgumentTypeMismatchException ");
+        String error = "Unknown " + e.getName() + ": " + e.getValue();
+        return ResponseEntity.status(400).body(new ErrorResponse(error));
     }
 
     @ExceptionHandler
-    @ResponseStatus(HttpStatus.CONFLICT)
-    public Map<String, String> notValid(final ConflictException e) {
-        return Map.of("", e.getMessage());
+    public ResponseEntity<ErrorResponse> notFoundException(final NotFoundException e) {
+        log.error("NotFoundException ");
+
+        return ResponseEntity.status(404).body(new ErrorResponse(e.getMessage()));
+    }
+
+    @ExceptionHandler(NullPointerException.class)
+    public ResponseEntity<ErrorResponse> badRequestException(final NullPointerException e) {
+        log.error("badRequestException ");
+        String error = "Bad request";
+        return ResponseEntity.status(400).body(new ErrorResponse(error));
     }
 
     @ExceptionHandler
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public Map<String, String> exception(final Exception e) {
-        return Map.of("", e.getMessage());
+    public ResponseEntity<ErrorResponse> conflictException(final ConflictException e) {
+        log.error("conflictException ");
+        return ResponseEntity.status(409).body(new ErrorResponse(e.getMessage()));
     }
 
     @ExceptionHandler
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Map<String, String> notValid(final BadRequestException e) {
-        return Map.of("", e.getMessage());
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Map<String, String> notValid(final MethodArgumentNotValidException e) {
-        return Map.of("", e.getMessage());
+    public ResponseEntity<ErrorResponse> badRequestException(final BadRequestException e) {
+        log.error("badRequestException ");
+        String error = "Bad request";
+        return ResponseEntity.status(400).body(new ErrorResponse(error));
     }
 }
