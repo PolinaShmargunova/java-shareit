@@ -43,7 +43,6 @@ public class BookingServiceTest {
     @InjectMocks
     BookingServiceImpl bookingService;
 
-    Booking booking1;
     @Test
     void addBooking() throws NotFoundException {
         long itemId = 1L;
@@ -83,7 +82,6 @@ public class BookingServiceTest {
         assertThrows(NullPointerException.class, () -> bookingService.approveBooking(1, true, itemId));
     }
 
-
     @Test
     void getBooking() throws NotFoundException {
         long itemId = 1L;
@@ -100,6 +98,7 @@ public class BookingServiceTest {
                 .thenReturn(Optional.of(BookingMapper.toBooking(dto, bookerId, Status.WAITING)));
         assertThrows(NoSuchElementException.class, () -> bookingService.getBooking(1, bookerId));
     }
+
     @Test
     public void getBookingWithDifferentBookerAndOwnerIds() {
         long bookingId = 1L;
@@ -121,7 +120,6 @@ public class BookingServiceTest {
         verify(bookingRepository, times(1)).findById(bookingId);
         verify(itemRepository, times(1)).findById(booking.getItemId());
     }
-
 
     @Test
     void getBookingNotFound() throws NotFoundException {
