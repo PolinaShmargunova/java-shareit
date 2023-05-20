@@ -67,6 +67,7 @@ public class BookingControllerTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
+
     @Test
     void approveBooking() throws Exception {
         final BookingDto bookingDto = new BookingDto();

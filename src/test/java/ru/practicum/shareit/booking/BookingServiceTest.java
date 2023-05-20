@@ -112,7 +112,7 @@ public class BookingServiceTest {
     }
 
     @Test
-    void addBooking_whenEndDateIsBeforeStartDate(){
+    void addBooking_whenEndDateIsBeforeStartDate() {
         BookingDto dto = new BookingDto();
         dto.setItemId(1L);
         dto.setStart(LocalDateTime.now().plusDays(1));
