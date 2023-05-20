@@ -20,8 +20,8 @@ public class ExceptionsHandler {
     @ExceptionHandler
     public ResponseEntity<ErrorResponse> notFoundException(final NotFoundException e) {
         log.error("NotFoundException ");
-
-        return ResponseEntity.status(404).body(new ErrorResponse(e.getMessage()));
+        String error = "Not found";
+        return ResponseEntity.status(404).body(new ErrorResponse(error));
     }
 
     @ExceptionHandler(NullPointerException.class)
@@ -34,7 +34,8 @@ public class ExceptionsHandler {
     @ExceptionHandler
     public ResponseEntity<ErrorResponse> conflictException(final ConflictException e) {
         log.error("conflictException ");
-        return ResponseEntity.status(409).body(new ErrorResponse(e.getMessage()));
+        String error = "Conflict";
+        return ResponseEntity.status(409).body(new ErrorResponse(error));
     }
 
     @ExceptionHandler
@@ -43,4 +44,5 @@ public class ExceptionsHandler {
         String error = "Bad request";
         return ResponseEntity.status(400).body(new ErrorResponse(error));
     }
+
 }

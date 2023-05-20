@@ -10,16 +10,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import ru.practicum.shareit.exception.ConflictException;
+import ru.practicum.shareit.exception.BadRequestException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.user.model.User;
 
 import javax.validation.Valid;
 import java.util.List;
 
-/**
- * TODO Sprint add-controllers.
- */
 @Slf4j
 @RestController
 @RequestMapping(path = "/users")
@@ -29,7 +26,7 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping
-    public User add(@Valid @RequestBody User user) throws ConflictException {
+    public User add(@Valid @RequestBody User user) throws BadRequestException {
         log.info("Получен запрос POST /users");
         return userService.add(user);
     }
@@ -47,7 +44,7 @@ public class UserController {
     }
 
     @PatchMapping(value = "/{id}")
-    public User update(@RequestBody User user, @PathVariable long id) throws NotFoundException {
+    public User update(@RequestBody User user, @PathVariable long id) {
         log.info(String.format("Получен запрос PATCH /users/%s", id));
         return userService.update(user, id);
     }

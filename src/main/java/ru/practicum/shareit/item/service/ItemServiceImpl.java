@@ -2,6 +2,8 @@ package ru.practicum.shareit.item.service;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.storage.BookingRepository;
@@ -41,19 +43,20 @@ public class ItemServiceImpl implements ItemService {
         if (userRepository.existsById(ownerId)) {
             return toItemDto(itemRepository.save(toItem(dto, ownerId)));
         } else {
-            throw new NotFoundException("Не найден пользователь с id " + ownerId);
+            throw new NotFoundException();
         }
     }
 
     @Override
     public ItemDto patchItem(ItemDto dto, long ownerId, long itemId) throws NotFoundException {
-        Optional<Item> idItemDatabase = itemRepository.findById(itemId);
         dto.setId(itemId);
+        Optional<Item> itemIdDatabase = itemRepository.findById(itemId);
+
         if (getItemOwnerId(itemId) != ownerId) {
-            throw new NotFoundException("Обновление невозможно");
+            throw new NotFoundException();
         }
-        if (idItemDatabase.isPresent()) {
-            Item oldItem = idItemDatabase.get();
+        if (itemIdDatabase.isPresent()) {
+            Item oldItem = itemIdDatabase.get();
 
             if (dto.getName() == null) {
                 dto.setName(oldItem.getName());
@@ -65,7 +68,7 @@ public class ItemServiceImpl implements ItemService {
                 dto.setAvailable(oldItem.isAvailable());
             }
         } else {
-            throw new NotFoundException("Обновление невозможно");
+            throw new NotFoundException();
         }
         log.info("Обновлен предмет с id " + itemId);
         return toItemDto(itemRepository.save(toItem(dto, ownerId)));
@@ -86,7 +89,8 @@ public class ItemServiceImpl implements ItemService {
             List<Booking> bookings;
 
             if (item.getOwnerId() == ownerId) {
-                bookings = new ArrayList<>(bookingRepository.allBookingsForItem(itemId));
+                bookings = new ArrayList<>(bookingRepository.allBookingsForItem(itemId,
+                        Sort.by(Sort.Direction.ASC, "start")));
             } else {
                 bookings = Collections.emptyList();
             }
@@ -96,19 +100,21 @@ public class ItemServiceImpl implements ItemService {
                         item, bookings, comments
                 );
             } else {
-                return toGetItemDto(item, null, comments);
+                return toGetItemDto(item, null, null, comments);
             }
         } else {
-            throw new NotFoundException("Данный предмет не существует");
+            throw new NotFoundException();
         }
     }
 
     @Override
-    public List<GetItemDto> getAllItemsByOwner(long ownerId) {
+    public List<GetItemDto> getAllItemsByOwner(long ownerId, Integer from, Integer size) {
+        PageRequest pageRequest = PageRequest.of((from / size), size);
         List<GetItemDto> allItems =
-                itemRepository.findAll().stream()
+                itemRepository.findAll(pageRequest)
+                        .stream()
                         .filter(l -> l.getOwnerId() == ownerId)
-                        .map(l -> ItemMapper.toGetItemDto(l, null, null))
+                        .map(l -> toGetItemDto(l, null, null, null))
                         .sorted(Comparator.comparing(GetItemDto::getId))
                         .collect(Collectors.toList());
 
@@ -137,9 +143,10 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDto> searchItem(String text, long ownerId) {
+    public List<ItemDto> searchItem(String text, long ownerId, Integer from, Integer size) {
         if (!text.equals("")) {
-            return itemRepository.search(text)
+            PageRequest pageRequest = PageRequest.of((from / size), size);
+            return itemRepository.search(text, pageRequest)
                     .stream()
                     .filter(Item::isAvailable)
                     .map(ItemMapper::toItemDto)

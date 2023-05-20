@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 import lombok.experimental.FieldDefaults;
 
 import javax.persistence.Column;
@@ -19,7 +18,6 @@ import javax.validation.constraints.NotNull;
 
 @Getter
 @Setter
-@ToString
 @Entity
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @AllArgsConstructor
@@ -31,8 +29,7 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     long id;
 
-    @NotNull
-    @Column(name = "name", nullable = false)
+    @Column(name = "name")
     String name;
 
     @Email
