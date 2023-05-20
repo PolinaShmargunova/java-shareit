@@ -38,7 +38,7 @@ public class BookingServiceImpl implements BookingService {
 
         if ((itemIdDatabase.isEmpty() || userRepository.findById(bookerId).isEmpty())
                 || itemIdDatabase.get().getOwnerId() == bookerId) {
-            throw new NotFoundException();
+            throw new NotFoundException("Не найдены параметра для создания бронирования");
         }
         if (itemIdDatabase.get().isAvailable()
                 && dto.getEnd().isAfter(dto.getStart())) {
@@ -51,12 +51,13 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public FullBookingDto approveBooking(long bookingId, boolean approved, long itemOwnerId) throws BadRequestException {
+    public FullBookingDto approveBooking(long bookingId, boolean approved, long itemOwnerId)
+            throws BadRequestException {
         Optional<Booking> bookingIdDatabase = bookingRepository.findById(bookingId);
 
         if (itemRepository.findById(bookingIdDatabase.get()
                 .getItemId()).get().getOwnerId() != itemOwnerId) {
-            throw new NotFoundException();
+            throw new NotFoundException("Не найден владелец вещи");
         }
         if (bookingIdDatabase.isPresent()) {
             long bookerId = bookingIdDatabase.get().getBookerId();
@@ -77,7 +78,7 @@ public class BookingServiceImpl implements BookingService {
             return BookingMapper.toFullBookingFromBooking(bookingRepository.save(booking), status,
                     itemRepository, userRepository);
         } else {
-            throw new NotFoundException();
+            throw new NotFoundException("Несуществующее бронирование");
         }
     }
 
@@ -89,20 +90,21 @@ public class BookingServiceImpl implements BookingService {
         if (bookingIdDatabase.isPresent()) {
             booking = bookingIdDatabase.get();
         } else {
-            throw new NotFoundException();
+            throw new NotFoundException("Такого бронирования не существует");
         }
         if (booking.getBookerId() != bookerId &&
                 itemRepository.findById(booking.getItemId()).get().getOwnerId() != bookerId) {
-            throw new NotFoundException();
+            throw new NotFoundException("");
         }
         Status status = booking.getStatus();
         return BookingMapper.toFullBookingFromBooking(booking, status, itemRepository, userRepository);
     }
 
     @Override
-    public List<FullBookingDto> getAllBookingsByBookerId(long bookerId, BookingState state, Integer from, Integer size) {
+    public List<FullBookingDto> getAllBookingsByBookerId(long bookerId, BookingState state,
+                                                         Integer from, Integer size) {
         if (userRepository.findById(bookerId).isEmpty()) {
-            throw new NotFoundException();
+            throw new NotFoundException("Не найден хозяин бронирования");
         }
         PageRequest pageRequest = PageRequest.of((from / size), size, Sort.by(Sort.Direction.DESC, "start"));
         switch (state) {
@@ -157,9 +159,10 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<FullBookingDto> getAllBookingByItemsByOwnerId(long ownerId, BookingState state, Integer from, Integer size) {
+    public List<FullBookingDto> getAllBookingByItemsByOwnerId(long ownerId, BookingState state,
+                                                              Integer from, Integer size) {
         if (userRepository.findById(ownerId).isEmpty()) {
-            throw new NotFoundException();
+            throw new NotFoundException("Не найден владелец вещи");
         }
         PageRequest pageRequest = PageRequest.of((from / size), size, Sort.by(Sort.Direction.DESC, "start"));
         switch (state) {

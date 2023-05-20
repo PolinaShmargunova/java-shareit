@@ -93,7 +93,7 @@ public class UserControllerTest {
     void getUserNotExist() throws Exception {
         final UserDto userDto = new UserDto(0, "test", "test@test.com");
         when(userService.getUserById(1))
-                .thenThrow(new NotFoundException());
+                .thenThrow(new NotFoundException("Данный пользователь не существует"));
 
         mvc.perform(get("/users/1")
                         .content(mapper.writeValueAsString(userDto))

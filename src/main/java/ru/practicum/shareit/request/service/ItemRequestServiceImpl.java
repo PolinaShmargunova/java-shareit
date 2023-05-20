@@ -31,7 +31,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         if (userRepository.existsById(userId)) {
             return itemRequestRepository.save(ItemRequestMapper.toItemRequest(request, userId));
         } else {
-            throw new NotFoundException();
+            throw new NotFoundException("Не удалось добавить ответ");
         }
     }
 
@@ -57,7 +57,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
             }
             return requests;
         } else {
-            throw new NotFoundException();
+            throw new NotFoundException("Не удалось вернуть ответы");
         }
     }
 
@@ -83,7 +83,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
             }
             return requests;
         } else {
-            throw new NotFoundException();
+            throw new NotFoundException("Не удалось вернуть ответы");
         }
     }
 
@@ -100,7 +100,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
 
             return requestDto;
         } else {
-            throw new NotFoundException();
+            throw new NotFoundException("Данный ответ не существует");
         }
     }
 }

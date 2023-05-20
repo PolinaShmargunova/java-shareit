@@ -30,7 +30,7 @@ public class UserService {
             log.info("Получен пользователь с id " + id);
             return userIdDatabase.get();
         } else {
-            throw new NotFoundException();
+            throw new NotFoundException("Не удалось получиль пользователя с id " + id);
         }
     }
 
@@ -46,14 +46,14 @@ public class UserService {
             if (userIdDatabase.isPresent()) {
                 user.setName(userIdDatabase.get().getName());
             } else {
-                throw new NotFoundException();
+                throw new NotFoundException("Не удалось обновить пользователя по имени");
             }
         }
         if (user.getEmail() == null) {
             if (userIdDatabase.isPresent()) {
                 user.setEmail(userIdDatabase.get().getEmail());
             } else {
-                throw new NotFoundException();
+                throw new NotFoundException("Не удалось обновить пользователя по email");
             }
         }
         log.info("Обновлен пользователь с id " + id);

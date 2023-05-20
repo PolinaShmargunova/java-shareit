@@ -14,7 +14,6 @@ import ru.practicum.shareit.booking.model.enums.BookingState;
 import ru.practicum.shareit.booking.model.enums.Status;
 import ru.practicum.shareit.booking.service.BookingServiceImpl;
 import ru.practicum.shareit.booking.storage.BookingRepository;
-import ru.practicum.shareit.exception.BadRequestException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemMapper;
@@ -28,11 +27,10 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class BookingServiceTest {
@@ -45,8 +43,9 @@ public class BookingServiceTest {
     @InjectMocks
     BookingServiceImpl bookingService;
 
+    Booking booking1;
     @Test
-    void addBooking() throws NotFoundException, BadRequestException {
+    void addBooking() throws NotFoundException {
         long itemId = 1L;
         long ownerId = 2L;
         long bookerId = 1L;
@@ -65,7 +64,7 @@ public class BookingServiceTest {
     }
 
     @Test
-    void approveBooking() throws NotFoundException, BadRequestException {
+    void approveBooking() throws NotFoundException {
         long itemId = 1L;
         long ownerId = 1L;
         long bookerId = 1L;
@@ -84,8 +83,9 @@ public class BookingServiceTest {
         assertThrows(NullPointerException.class, () -> bookingService.approveBooking(1, true, itemId));
     }
 
+
     @Test
-    void getBooking() throws NotFoundException, BadRequestException {
+    void getBooking() throws NotFoundException {
         long itemId = 1L;
         long ownerId = 1L;
         long bookerId = 1L;
@@ -100,9 +100,31 @@ public class BookingServiceTest {
                 .thenReturn(Optional.of(BookingMapper.toBooking(dto, bookerId, Status.WAITING)));
         assertThrows(NoSuchElementException.class, () -> bookingService.getBooking(1, bookerId));
     }
+    @Test
+    public void getBookingWithDifferentBookerAndOwnerIds() {
+        long bookingId = 1L;
+        long bookerId = 2L;
+        Booking booking = new Booking();
+        booking.setId(bookingId);
+        booking.setBookerId(3L);
+        Item item = new Item();
+        item.setId(4L);
+        item.setOwnerId(5L);
+
+        Optional<Booking> optionalBooking = Optional.of(booking);
+
+        when(bookingRepository.findById(bookingId)).thenReturn(optionalBooking);
+        when(itemRepository.findById(booking.getItemId())).thenReturn(Optional.of(item));
+
+        assertThrows(NotFoundException.class, () -> bookingService.getBooking(bookingId, bookerId));
+
+        verify(bookingRepository, times(1)).findById(bookingId);
+        verify(itemRepository, times(1)).findById(booking.getItemId());
+    }
+
 
     @Test
-    void getBookingNotFound() throws NotFoundException, BadRequestException {
+    void getBookingNotFound() throws NotFoundException {
         long itemId = 1L;
         long ownerId = 1L;
         long bookerId = 1L;
@@ -119,7 +141,7 @@ public class BookingServiceTest {
     }
 
     @Test
-    void getAllBookings() throws NotFoundException, BadRequestException {
+    void getAllBookings() throws NotFoundException {
         long itemId = 1L;
         long ownerId = 1L;
         long bookerId = 1L;
@@ -160,7 +182,7 @@ public class BookingServiceTest {
     }
 
     @Test
-    void getAllBookingsNotFoundUser() throws NotFoundException, BadRequestException {
+    void getAllBookingsNotFoundUser() throws NotFoundException {
         long itemId = 1L;
         long ownerId = 1L;
         long bookerId = 1L;
@@ -179,7 +201,7 @@ public class BookingServiceTest {
     }
 
     @Test
-    void getAllBookingsByItems() throws NotFoundException, BadRequestException {
+    void getAllBookingsByItems() throws NotFoundException {
         long itemId = 1L;
         long ownerId = 1L;
         long bookerId = 1L;
@@ -219,7 +241,7 @@ public class BookingServiceTest {
     }
 
     @Test
-    void getAllBookingsByItemsNotFoundUser() throws NotFoundException, BadRequestException {
+    void getAllBookingsByItemsNotFoundUser() throws NotFoundException {
         long itemId = 1L;
         long ownerId = 1L;
         long bookerId = 1L;
