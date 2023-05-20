@@ -33,6 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(controllers = {BookingController.class, ExceptionsHandler.class})
 public class BookingControllerTest {
+
     @MockBean
     BookingService bookingService;
     @Autowired
@@ -66,7 +67,6 @@ public class BookingControllerTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
-
     @Test
     void approveBooking() throws Exception {
         final BookingDto bookingDto = new BookingDto();

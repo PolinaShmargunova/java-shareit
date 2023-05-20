@@ -1,5 +1,6 @@
 package ru.practicum.shareit.user;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -16,11 +17,10 @@ import ru.practicum.shareit.user.storage.UserRepository;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
@@ -29,6 +29,21 @@ public class UserServiceTest {
 
     @InjectMocks
     private UserService userService;
+
+    @Test
+    void testDataAnnotation() {
+
+        UserDto userDto = new UserDto(1, "Test", "test@test.com");
+
+        assertEquals(1, userDto.getId());
+        assertEquals("Test", userDto.getName());
+        assertEquals("test@test.com", userDto.getEmail());
+
+        UserDto userDto2 = new UserDto(1, "Test", "test@test.com");
+        assertTrue(userDto.equals(userDto2));
+        assertEquals(userDto.hashCode(), userDto2.hashCode());
+        assertEquals(userDto.toString(), userDto2.toString());
+    }
 
     @Test
     void addNewUser() throws BadRequestException, NotFoundException {
@@ -125,5 +140,32 @@ public class UserServiceTest {
                 .thenReturn(expectedUser);
         User actualUser = userService.update(noEmailUser, userId);
         assertEquals(expectedUser, actualUser);
+    }
+
+    @Test
+    public void testDeleteUser() {
+        long userId = 1L;
+        User expectedUser = new User(userId, "Test", "test@test.com");
+        userRepository.save(expectedUser);
+        long id = expectedUser.getId();
+
+        userService.delete(id);
+
+        assertFalse(userRepository.existsById(id));
+    }
+
+    @Test
+    public void testDelete() {
+        UserService userServiceMock = mock(UserService.class);
+
+        UserController userController = new UserController(userServiceMock);
+
+        User user = new User();
+        user.setId(1);
+        user.setName("Test");
+
+        userController.delete(1);
+
+        verify(userServiceMock, times(1)).delete(1);
     }
 }

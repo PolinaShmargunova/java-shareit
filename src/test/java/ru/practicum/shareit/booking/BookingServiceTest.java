@@ -14,6 +14,7 @@ import ru.practicum.shareit.booking.model.enums.BookingState;
 import ru.practicum.shareit.booking.model.enums.Status;
 import ru.practicum.shareit.booking.service.BookingServiceImpl;
 import ru.practicum.shareit.booking.storage.BookingRepository;
+import ru.practicum.shareit.exception.BadRequestException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemMapper;
@@ -30,7 +31,10 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.*;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class BookingServiceTest {
@@ -60,6 +64,102 @@ public class BookingServiceTest {
         when(userRepository.findById(anyLong()))
                 .thenReturn(Optional.of(newUser));
         assertThrows(NullPointerException.class, () -> bookingService.addBooking(dto, bookerId));
+    }
+
+    @Test
+    void testAddBookingItemUnavailable() {
+        // arrange
+        BookingDto dto = new BookingDto();
+        dto.setItemId(1L);
+        dto.setStart(LocalDateTime.now());
+        dto.setEnd(LocalDateTime.now().plusDays(1));
+        long bookerId = 2L;
+
+        Item item = new Item();
+        item.setId(1L);
+        item.setName("Item 1");
+        item.setAvailable(false);
+        item.setDescription("A description");
+        item.setOwnerId(bookerId);
+        itemRepository.save(item);
+
+        assertThrows(NotFoundException.class, () -> {
+            bookingService.addBooking(dto, bookerId);
+        });
+    }
+
+    @Test
+    void addBooking_whenItemIsNotAvailable() {
+        BookingDto dto = new BookingDto();
+        dto.setItemId(1L);
+        dto.setStart(LocalDateTime.now().plusDays(1));
+        dto.setEnd(LocalDateTime.now().plusDays(2));
+
+        User owner = new User();
+        owner.setId(1L);
+        Item item = new Item();
+        item.setId(1L);
+        item.setOwnerId(owner.getId());
+        itemRepository.save(item);
+
+        given(userRepository.findById(owner.getId())).willReturn(Optional.of(owner));
+        given(itemRepository.findById(item.getId())).willReturn(Optional.of(item));
+
+        item.setAvailable(false);
+        assertThrows(NotFoundException.class, () -> {
+            bookingService.addBooking(dto, owner.getId());
+        });
+    }
+
+    @Test
+    void addBooking_whenEndDateIsBeforeStartDate(){
+        BookingDto dto = new BookingDto();
+        dto.setItemId(1L);
+        dto.setStart(LocalDateTime.now().plusDays(1));
+        dto.setEnd(LocalDateTime.now().plusDays(2));
+
+        User owner = new User();
+        owner.setId(1L);
+        Item item = new Item();
+        item.setId(1L);
+        item.setOwnerId(owner.getId());
+        itemRepository.save(item);
+
+        given(userRepository.findById(owner.getId())).willReturn(Optional.of(owner));
+        given(itemRepository.findById(item.getId())).willReturn(Optional.of(item));
+
+        item.setAvailable(true);
+        dto.setEnd(LocalDateTime.now().plusDays(-1));
+        assertThrows(NotFoundException.class, () -> {
+            bookingService.addBooking(dto, owner.getId());
+        });
+    }
+
+    @Test
+    void addBooking_whenBookerIdIsInvalid() {
+        BookingDto dto = new BookingDto();
+        dto.setItemId(1L);
+        dto.setStart(LocalDateTime.now().plusDays(1));
+        dto.setEnd(LocalDateTime.now().plusDays(2));
+
+        User owner = new User();
+        owner.setId(1L);
+        Item item = new Item();
+        item.setId(1L);
+        item.setOwnerId(owner.getId());
+        itemRepository.save(item);
+
+        given(userRepository.findById(owner.getId())).willReturn(Optional.of(owner));
+        given(itemRepository.findById(item.getId())).willReturn(Optional.of(item));
+
+        assertThrows(NotFoundException.class, () -> {
+            bookingService.addBooking(dto, owner.getId());
+
+            given(userRepository.findById(owner.getId())).willReturn(Optional.of(owner));
+        assertThrows(BadRequestException.class, () -> {
+            bookingService.addBooking(dto, owner.getId());
+        });
+        });
     }
 
     @Test

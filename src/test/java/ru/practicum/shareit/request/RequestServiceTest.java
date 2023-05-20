@@ -40,6 +40,14 @@ public class RequestServiceTest {
     ItemRequestServiceImpl requestService;
 
     @Test
+    public void testSetDescription() {
+        ItemRequest itemRequest = new ItemRequest();
+        String description = "test description";
+        itemRequest.setDescription(description);
+        assertEquals(description, itemRequest.getDescription());
+    }
+
+    @Test
     void addRequest() {
         long userId = 1L;
         User newUser = new User(1, "test", "test@test.com");
