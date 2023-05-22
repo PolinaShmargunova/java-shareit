@@ -68,7 +68,6 @@ public class BookingServiceTest {
 
     @Test
     void testAddBookingItemUnavailable() {
-        // arrange
         BookingDto dto = new BookingDto();
         dto.setItemId(1L);
         dto.setStart(LocalDateTime.now());

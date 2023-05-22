@@ -1,10 +1,6 @@
 package ru.practicum.shareit.user.model;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import javax.persistence.Column;
@@ -19,6 +15,7 @@ import javax.validation.constraints.NotNull;
 @Getter
 @Setter
 @Entity
+@Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @AllArgsConstructor
 @NoArgsConstructor

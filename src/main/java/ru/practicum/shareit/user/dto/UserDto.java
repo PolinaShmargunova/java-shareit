@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.experimental.FieldDefaults;
 
 import javax.validation.constraints.Email;
+import javax.validation.constraints.NotNull;
 
 @Data
 @AllArgsConstructor
@@ -16,6 +17,7 @@ public class UserDto {
 
     String name;
 
-    @Email
+    @NotNull(message = "Email is null")
+    @Email(message = "Email Is Invalid")
     String email;
 }

@@ -7,7 +7,6 @@ import lombok.experimental.FieldDefaults;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.item.model.Comment;
 
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
@@ -18,7 +17,6 @@ public class GetItemDto {
     long id;
 
     @NotNull
-    @NotBlank
     String name;
 
     @NotNull
