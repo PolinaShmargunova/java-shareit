@@ -28,7 +28,8 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
@@ -155,9 +156,9 @@ public class BookingServiceTest {
             bookingService.addBooking(dto, owner.getId());
 
             given(userRepository.findById(owner.getId())).willReturn(Optional.of(owner));
-        assertThrows(BadRequestException.class, () -> {
-            bookingService.addBooking(dto, owner.getId());
-        });
+            assertThrows(BadRequestException.class, () -> {
+                bookingService.addBooking(dto, owner.getId());
+            });
         });
     }
 
