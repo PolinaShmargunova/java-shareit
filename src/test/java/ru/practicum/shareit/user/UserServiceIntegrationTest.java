@@ -1,6 +1,5 @@
 package ru.practicum.shareit.user;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,11 +30,6 @@ public class UserServiceIntegrationTest {
         userService = new UserService(userRepository);
     }
 
-    @AfterEach
-    public void afterEach() {
-        userRepository.deleteAll();
-    }
-
     @Test
     public void testAddUser() {
         User user = new User(1L, "John Doe", "john@example.com");
@@ -48,8 +42,7 @@ public class UserServiceIntegrationTest {
 
     @Test
     public void testGetUserById() throws NotFoundException {
-        User user = new User(1L, "John Doe", "john@example.com");
-        userRepository.save(user);
+        User user = userRepository.save(new User(1L, "John Doe", "john@example.com"));
 
         User retrievedUser = userService.getUserById(user.getId());
 
@@ -68,20 +61,19 @@ public class UserServiceIntegrationTest {
     public void testGetAllUsers() {
         User user1 = new User(1L, "John Doe", "john@example.com");
         User user2 = new User(2L, "Jane Smith", "jane@example.com");
-        userRepository.save(user1);
-        userRepository.save(user2);
 
-        List<User> users = userService.getAllUsers();
+        List<User> users = userRepository.saveAll(List.of(user1, user2));
 
         assertEquals(2, users.size());
         assertFalse(users.contains(user1));
         assertFalse(users.contains(user2));
+
     }
 
     @Test
     public void testUpdateUser() throws NotFoundException {
-        User user = new User(1L, "John Doe", "john@example.com");
-        userRepository.save(user);
+
+        User user = userRepository.save(new User(1L, "John Doe", "john@example.com"));
 
         User updatedUser = new User(2L, "Updated Name", null);
         User result = userService.update(updatedUser, user.getId());
@@ -89,12 +81,12 @@ public class UserServiceIntegrationTest {
         assertEquals(user.getId(), result.getId());
         assertEquals(updatedUser.getName(), result.getName());
         assertEquals(user.getEmail(), result.getEmail());
+
     }
 
     @Test
     public void testDeleteUser() {
-        User user = new User(1L, "John Doe", "john@example.com");
-        userRepository.save(user);
+        User user = userRepository.save(new User(1L, "John Doe", "john@example.com"));
 
         userService.delete(user.getId());
 

@@ -6,7 +6,6 @@ import ru.practicum.shareit.item.dto.GetItemDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Comment;
 
-import java.awt.print.Pageable;
 import java.util.List;
 
 public interface ItemService {
