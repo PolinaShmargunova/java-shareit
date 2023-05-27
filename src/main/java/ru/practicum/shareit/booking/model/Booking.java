@@ -28,17 +28,23 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Booking {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     long id;
+
     @Column(name = "start_date")
     LocalDateTime start;
+
     @Column(name = "end_date")
     LocalDateTime end;
+
     @Column(name = "item_id")
     long itemId;
+
     @Column(name = "booker_id")
     long bookerId;
+
     @Enumerated(EnumType.STRING)
     Status status;
 }

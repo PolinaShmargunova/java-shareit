@@ -34,6 +34,7 @@ public class ExceptionsHandler {
     @ExceptionHandler
     public ResponseEntity<ErrorResponse> conflictException(final ConflictException e) {
         log.error("conflictException ");
+
         return ResponseEntity.status(409).body(new ErrorResponse(e.getMessage()));
     }
 
@@ -43,4 +44,5 @@ public class ExceptionsHandler {
         String error = "Bad request";
         return ResponseEntity.status(400).body(new ErrorResponse(error));
     }
+
 }

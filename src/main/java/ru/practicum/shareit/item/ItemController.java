@@ -19,6 +19,7 @@ import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.service.ItemService;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
 import java.util.List;
 
 @Slf4j
@@ -31,8 +32,7 @@ public class ItemController {
     private final String header = "X-Sharer-User-Id";
 
     @PostMapping
-    public ItemDto addItem(@RequestBody @Valid ItemDto dto, @RequestHeader(header) long ownerId)
-            throws NotFoundException {
+    public ItemDto addItem(@RequestBody @Valid ItemDto dto, @RequestHeader(header) long ownerId) throws NotFoundException {
         log.info("Получен запрос POST /items");
         return itemService.addItem(dto,ownerId);
     }
@@ -45,21 +45,29 @@ public class ItemController {
     }
 
     @GetMapping(value = "/{itemId}")
-    public GetItemDto getItem(@PathVariable long itemId, @RequestHeader(header) long ownerId) throws NotFoundException {
+    public GetItemDto getItem(@PathVariable long itemId, @RequestHeader(header) long ownerId) {
         log.info(String.format("Получен запрос GET /items/%s", itemId));
         return itemService.getItem(itemId,ownerId);
     }
 
     @GetMapping
-    public List<GetItemDto> getAllItemsByOwner(@RequestHeader(header) long ownerId) {
+    public List<GetItemDto> getAllItemsByOwner(@RequestHeader(header) long ownerId,
+                                               @RequestParam(required = false, defaultValue = "0")
+                                               @Min(0) Integer from,
+                                               @RequestParam(required = false, defaultValue = "10")
+                                               Integer size) {
         log.info("Получен запрос GET /items");
-        return itemService.getAllItemsByOwner(ownerId);
+        return itemService.getAllItemsByOwner(ownerId, from, size);
     }
 
     @GetMapping("/search")
-    public List<ItemDto> searchItem(@RequestParam String text, @RequestHeader(header) long ownerId) {
+    public List<ItemDto> searchItem(@RequestParam String text, @RequestHeader(header) long ownerId,
+                                    @RequestParam(required = false, defaultValue = "0")
+                                    @Min(0) Integer from,
+                                    @RequestParam(required = false, defaultValue = "10")
+                                    Integer size) {
         log.info(String.format("Получен запрос GET /items/search?text=%s", text));
-        return itemService.searchItem(text.toLowerCase(),ownerId);
+        return itemService.searchItem(text.toLowerCase(), ownerId, from, size);
     }
 
     @PostMapping("{itemId}/comment")
