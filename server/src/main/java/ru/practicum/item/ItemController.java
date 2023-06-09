@@ -2,7 +2,6 @@ package ru.practicum.item;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.item.dto.CommentDto;
 import ru.practicum.item.dto.ItemDto;
@@ -15,7 +14,6 @@ import java.util.Collection;
 @RestController
 @RequestMapping("/items")
 @RequiredArgsConstructor
-@Validated
 public class ItemController {
 
     private final ItemService itemService;
